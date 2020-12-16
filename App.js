@@ -1,32 +1,44 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, FlatList } from 'react-native'
+import { StyleSheet, View, FlatList, Button } from 'react-native'
 
 import TodoInput from './components/TodoInput'
 import TodoItem from './components/TodoItem'
 
 export default function App() {
-	const [courseGoals, setCourseGoals] = useState([])
+	const [courseTodos, setCourseTodos] = useState([])
+	const [isAddMode, setIsAddMode] = useState(false)
 
-	const addGoalHandler = newGoal => {
-		// Append new goal to existing goals list using spread operator
+	const addTodoHandler = newTodo => {
+		// Append new Todo to existing Todos list using spread operator
 		// As well using an inline arrow function to ensure the most recent
-		//  version of the state 'courseGoals' is accessed
-		setCourseGoals(currentGoals => [
-			...currentGoals,
-			{ id: Math.random().toString(), value: newGoal },
+		//  version of the state 'courseTodos' is accessed
+		setCourseTodos(currentTodos => [
+			...currentTodos,
+			{ id: Math.random().toString(), value: newTodo },
 		])
+
+		setIsAddMode(false)
 	}
 
-	const removeGoalHandler = goalId => {
-		setCourseGoals(currentGoals => {
-			return currentGoals.filter(goal => goal.id !== goalId)
+	const cancelAddHandler = () => {
+		setIsAddMode(false)
+	}
+
+	const removeTodoHandler = todoId => {
+		setCourseTodos(currentTodos => {
+			return currentTodos.filter(todo => todo.id !== todoId)
 		})
 	}
 
 	return (
 		<View style={styles.screen}>
-			<TodoInput onAddGoal={addGoalHandler} />
+			<Button title="Add New Todo" onPress={() => setIsAddMode(true)} />
 
+			<TodoInput
+				visible={isAddMode}
+				addTodo={addTodoHandler}
+				onCancel={cancelAddHandler}
+			/>
 			{/* Scrolling will always need to be explictly defined using <ScrollView> */}
 			{/* <FlatList> also works, but works better with potentially very long lists as it
                 optimizes the rendering of the items in list, only rendering the minimum possible */}
@@ -34,12 +46,12 @@ export default function App() {
                 FlatList finding the key for the list items */}
 			<FlatList
 				keyExtractor={(item, index) => item.id}
-				data={courseGoals}
+				data={courseTodos}
 				renderItem={itemData => (
 					<TodoItem
 						id={itemData.item.id}
 						title={itemData.item.value}
-						onDelete={removeGoalHandler}
+						onDelete={removeTodoHandler}
 					/>
 				)}
 			/>

@@ -1,41 +1,60 @@
 import React, { useState } from 'react'
-
-import { View, TextInput, Button, StyleSheet } from 'react-native'
+import { View, TextInput, Button, StyleSheet, Modal } from 'react-native'
 
 const TodoInput = props => {
-	const [enteredGoal, setEnteredGoal] = useState('')
+	const [enteredTodo, setEnteredTodo] = useState('')
 
-	const goalInputHandler = enteredText => {
-		setEnteredGoal(enteredText)
+	const todoInputHandler = enteredText => {
+		setEnteredTodo(enteredText)
+	}
+
+	let isValid = enteredTodo !== ''
+
+	// execute all tasks related to adding a todo
+	const addTodoHandler = () => {
+		if (isValid) {
+			props.addTodo(enteredTodo)
+			setEnteredTodo('')
+		}
 	}
 
 	return (
-		<View style={styles.inputContainer}>
-			{/* When a function is passed it is passed without parens to
+		<Modal visible={props.visible} animationType="slide">
+			<View style={styles.inputContainer}>
+				{/* When a function is passed it is passed without parens to
                 avoid executing the function at every render, instead a referrence
                 is passed such that it is called only when needed */}
-			<TextInput
-				style={styles.input}
-				placeholder="Todo Item"
-				onChangeText={goalInputHandler}
-				value={enteredGoal}
-			/>
-			<Button
-				title="ADD"
-				onPress={() => {
-					props.onAddGoal(enteredGoal)
-					setEnteredGoal('')
-				}}
-			/>
-		</View>
+				<TextInput
+					style={styles.input}
+					placeholder="Todo Item"
+					onChangeText={todoInputHandler}
+					value={enteredTodo}
+				/>
+				<View style={styles.inputButtonsContainer}>
+					{/* Buttons wrapped in <View> to apply styling that modifies
+						width, which is otherwise impossible */}
+					<View style={styles.button}>
+						<Button
+							title="CANCEL"
+							color="red"
+							onPress={props.onCancel}
+						/>
+					</View>
+
+					<View style={styles.button}>
+						<Button title="ADD" onPress={addTodoHandler} />
+					</View>
+				</View>
+			</View>
+		</Modal>
 	)
 }
 
-// Using flex box here to horizontally format items
+// flex: 1 here tells inputContainer to take up all the available space
 const styles = StyleSheet.create({
 	inputContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
+		flex: 1,
+		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	input: {
@@ -43,6 +62,13 @@ const styles = StyleSheet.create({
 		padding: 10,
 		borderColor: 'black',
 		borderWidth: 1,
+		marginBottom: 10,
+	},
+	inputButtonsContainer: {
+		flexDirection: 'row',
+	},
+	button: {
+		width: '30%',
 	},
 })
 
