@@ -1,47 +1,31 @@
 import React, { useState } from 'react'
-import {
-	StyleSheet,
-	Text,
-	View,
-	TextInput,
-	Button,
-	FlatList,
-} from 'react-native'
+import { StyleSheet, View, FlatList } from 'react-native'
+
+import TodoInput from './components/TodoInput'
+import TodoItem from './components/TodoItem'
 
 export default function App() {
-	const [enteredGoal, setEnteredGoal] = useState('')
 	const [courseGoals, setCourseGoals] = useState([])
 
-	const goalInputHandler = enteredText => {
-		setEnteredGoal(enteredText)
-	}
-
-	const addGoalHandler = () => {
+	const addGoalHandler = newGoal => {
 		// Append new goal to existing goals list using spread operator
 		// As well using an inline arrow function to ensure the most recent
 		//  version of the state 'courseGoals' is accessed
 		setCourseGoals(currentGoals => [
 			...currentGoals,
-			{ key: Math.random().toString(), value: enteredGoal },
+			{ id: Math.random().toString(), value: newGoal },
 		])
-		setEnteredGoal('')
+	}
+
+	const removeGoalHandler = goalId => {
+		setCourseGoals(currentGoals => {
+			return currentGoals.filter(goal => goal.id !== goalId)
+		})
 	}
 
 	return (
 		<View style={styles.screen}>
-			{/* Using flex box here to horizontally format items */}
-			<View style={styles.inputContainer}>
-				{/* When a function is passed it is passed without parens to
-                    avoid executing the function at every render, instead a referrence
-                    is passed such that it is called only when needed */}
-				<TextInput
-					style={styles.input}
-					placeholder="Course Goal"
-					onChangeText={goalInputHandler}
-					value={enteredGoal}
-				/>
-				<Button title="ADD" onPress={addGoalHandler} />
-			</View>
+			<TodoInput onAddGoal={addGoalHandler} />
 
 			{/* Scrolling will always need to be explictly defined using <ScrollView> */}
 			{/* <FlatList> also works, but works better with potentially very long lists as it
@@ -49,12 +33,14 @@ export default function App() {
 			{/* keyExtractor logic here is redundant, it is here to show the default behavior of 
                 FlatList finding the key for the list items */}
 			<FlatList
-				keyExtractor={(item, index) => item.key}
+				keyExtractor={(item, index) => item.id}
 				data={courseGoals}
 				renderItem={itemData => (
-					<View style={styles.listItem}>
-						<Text>{itemData.item.value}</Text>
-					</View>
+					<TodoItem
+						id={itemData.item.id}
+						title={itemData.item.value}
+						onDelete={removeGoalHandler}
+					/>
 				)}
 			/>
 		</View>
@@ -67,23 +53,5 @@ export default function App() {
 const styles = StyleSheet.create({
 	screen: {
 		padding: 50,
-	},
-	inputContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	input: {
-		width: '80%',
-		padding: 10,
-		borderColor: 'black',
-		borderWidth: 1,
-	},
-	listItem: {
-		padding: 10,
-		marginVertical: 10,
-		backgroundColor: '#ccc',
-		borderColor: 'black',
-		borderWidth: 1,
 	},
 })
