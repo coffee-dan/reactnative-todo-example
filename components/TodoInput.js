@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, TextInput, Button, StyleSheet, Modal } from 'react-native'
 
-const TodoInput = props => {
+export default function TodoInput({ addTodo, onCancel, visible }) {
 	const [enteredTodo, setEnteredTodo] = useState('')
 
 	const todoInputHandler = enteredText => {
@@ -13,13 +13,13 @@ const TodoInput = props => {
 	// execute all tasks related to adding a todo
 	const addTodoHandler = () => {
 		if (isValid) {
-			props.addTodo(enteredTodo)
+			addTodo(enteredTodo)
 			setEnteredTodo('')
 		}
 	}
 
 	return (
-		<Modal visible={props.visible} animationType="slide">
+		<Modal visible={visible} animationType="slide">
 			<View style={styles.inputContainer}>
 				{/* When a function is passed it is passed without parens to
                 avoid executing the function at every render, instead a referrence
@@ -34,11 +34,7 @@ const TodoInput = props => {
 					{/* Buttons wrapped in <View> to apply styling that modifies
 						width, which is otherwise impossible */}
 					<View style={styles.button}>
-						<Button
-							title="CANCEL"
-							color="red"
-							onPress={props.onCancel}
-						/>
+						<Button title="CANCEL" color="red" onPress={onCancel} />
 					</View>
 
 					<View style={styles.button}>
@@ -71,5 +67,3 @@ const styles = StyleSheet.create({
 		width: '30%',
 	},
 })
-
-export default TodoInput
